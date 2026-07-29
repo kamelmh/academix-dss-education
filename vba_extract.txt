@@ -1,0 +1,8 @@
+﻿python : C:\Users\Admin\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\python.exe: Error while finding 
+module specification for 'oletools.olevba' (ModuleNotFoundError: No module named 'oletools')
+At line:1 char:111
++ ... | Out-Null; python -m oletools.olevba "C:\Users\Admin\Desktop\erp_dss ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\Users\Admin\...med 'oletools'):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

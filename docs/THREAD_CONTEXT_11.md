@@ -1,0 +1,72 @@
+# Thread Context v11
+
+Key facts and notes for this thread. Updated by agent, survives context compaction.
+
+## Corrections
+
+2026-07-27: Founder identity = Kamel Mahi (kamelmahi71@gmail.com), agent owner. | Study TARGET LANGUAGE = English (EFL), NOT French/FLE (my earlier Methodology assumption was wrong). Corrected in Methodology §3 (Design, Participants, Reconciliation Notes). | All HyperAgent outputs now synced into the Obsidian LifeWorkspace vault (EdTech_System/ + PAPER_DRAFTS/). Full §1/§2↔§3 reconciliation still pending upload of 01_introduction.md + 02_literature_review.md.
+
+2026-07-27 (sync #2): OPEN DECISION flagged — OpenCode changed the app's bilingual pairing "Arabic/French" → "Arabic/English" in §3.2 & §3.4. Distinguish: (a) TARGET language = English/EFL (settled); (b) APP interface/gloss pairing = Arabic/French (project-long identity; founder builds Arabic/French products) OR Arabic/English (OpenCode's change). Needs Kamel's confirmation. If Arabic/French confirmed → revert §3.2/§3.4 app wording; if Arabic/English → propagate across abstract, French §3 (currently arabe/français), EN+FR compiled manuscripts, and the "bilingual design" questionnaire subscale. Not propagated yet.
+
+2026-07-27: RESOLVED — tblGrade stores CC (contrôle continu) + Compo (composition), NOT a single Mark. Subject mark rule = (CC + Compo×2)/3 (matches frmGradeEntry). rptBulletin queries (qryGradeCoef, qryBulletin) updated to compute + alias as Mark; report layout + VBA unchanged.
+
+2026-07-27: RESOLVED (flag closed) — bilingual pairing = Taallim app INTERFACE Arabic/French; English = target/study language (EFL). Both my recommendation and OpenCode's converge; Kamel relayed it approvingly. KEY: all HyperAgent docs ALREADY say Arabic/French consistently (§3 EN+FR, both compiled manuscripts, abstract, "bilingual design" subscale) — NO sweep needed on my side. The only "Arabic/English" text is in Kamel's LOCAL 03_methodology.md (§3.2/§3.4, OpenCode's edit); OpenCode to revert it there.
+
+2026-07-27: GROUND TRUTH from the actual §1/§2 (finally uploaded). The Ta'allim PAPER study is DISTINCT from the Allal SIS. OUTCOME = English GRAMMAR performance (NOT vocabulary — my §3–§6 had assumed vocabulary). Actual RQs: RQ1 = how to integrate AI into Algerian secondary EFL (design); RQ2 = effectiveness on GRAMMAR (quasi-exp); RQ3 = TEACHER perceptions/adoption (4 teachers, not learners). Setting = El Bayadh Province, 4 secondary schools, ~120 students + 4 teachers, 6 weeks, experimental vs control. Platform = multilingual (Ar/Fr/En) interface, offline, curriculum-aligned (64 grammar topics across 1AM–4AM). Theory/refs = Constructivism/Behaviourism/Connectivism, ZPD (Vygotsky), Ebbinghaus, Wozniak SM-2, Nakata, Tsai & Kerber, Al-Hoorie, Chen, Shei, Siemens, Skinner. App spelled 'Ta'allim'. ACTION DONE: rebuilt + re-exported the EN manuscript (files Taallim_Manuscript_EN.md/.docx updated in place) — §1/§2 inlined verbatim, §3 reconciled (grammar/RQs/El Bayadh/teachers), §4/§5/§6 reframed, 27 refs + 6 method refs merged. STILL TO SYNC to grammar/teacher framing: FR manuscript, standalone §3 (EN doc cms2o6awb... + FR doc), §4/§5 templates doc, and taallim_analysis.py labels (vocabulary→grammar).
+
+2026-07-27 (dual outcome): Kamel updated §3 locally to a DUAL outcome — GRAMMAR = primary (RQ2; H1 immediate, H2 retention, H3 dose-response), VOCABULARY = secondary/exploratory (H4). Two instruments (grammar test + vocabulary test); target = 60 grammar structures + 60 vocabulary items; pretest/posttest/delayed cover both. Bilingual pairing confirmed Arabic/French. Applied to the reconciled EN manuscript (Taallim_Manuscript_EN.md/.docx re-exported): §3.1 DVs, §3.2 H1–H4, §3.4 60+60 target, §3.5 added vocabulary test, §3.6 table, §4.3b exploratory vocabulary ANCOVA, §5/§6 vocabulary line, keywords. NOTE: §1/§2 already inlined from Kamel's earlier upload (his 're-paste' step unnecessary). Kamel created SYNC_PROTOCOL.md (his side) as ownership/sync single-source-of-truth. STILL PENDING: apply dual outcome to the FR manuscript (currently grammar-only); FR §1/§2 still placeholders.
+
+2026-07-27 (15:58): Both manuscripts now COMPLETE and re-exported. EN: abstract finalized to a full ~200-word narrative (grammar primary + vocabulary secondary + teacher adoption, bracketed result slots); §1/§2 already inlined (files confirmed identical to prior upload via md5). FR: fully built — §1 + §2 TRANSLATED into French and inlined, §3–§6 carry the dual outcome (grammar primary; vocabulary secondary/H4; 60 grammar structures + 60 vocab items; two instruments), grammar title/keywords/abstract, merged refs. Canonical = exported files Taallim_Manuscript_EN.(md/docx) + Taallim_Manuscrit_FR.(md/docx). Live in-app manuscript docs remain bannered → exported files are source of truth. Paper status: EN complete; FR complete; both one pilot (real data → taallim_analysis.py) from submission.
+
+2026-07-27 (18:40): A1 RESOLVED = study is in MIDDLE SCHOOLS / COLLÈGES (levels 1AM–4AM), not lycées. Synced my canonical _FINAL manuscripts to match OpenCode's local fix: EN secondary→middle (study refs only; kept the 2 ministerial-decision background lines + the 'primary and secondary schools' national stat); FR lycées→collèges, lycéens→collégiens, 'secondaire algérien'→'enseignement moyen', kept background 'au lycée' (line 24). Also applied SAFE French fluency fixes: 'propulsée par l'IA'→'fondée sur l'IA', 'Construction cible'→'Construit cible', 'voie évolutive'→'solution susceptible d'un passage à l'échelle', 'matériels authentiques'→'supports authentiques', 'enrichi par la technologie'→'par le numérique', 'zone proximale' lowercase, 'le témoin'→'le groupe témoin', 'données enseignantes'→'données issues des enseignants', 'Section' lowercase, ministry name→'Ministère de l'Éducation nationale' (FR in-text + ref). Re-exported _FINAL (md+docx, in place). STILL PENDING for the author: reference entries using 'et al.' (Hwang, Chen, Ben Salah) need FULL author lists (APA) — I can't fabricate names; and Multilinguales trilingual abstracts (EN + AR) not yet added. Kept 'devis' (defensible; not changed without his pick).
+
+2026-07-27 (19:25) — Major update from Kamel/OpenCode:
+1) SCHEMA TRUTH (from mod_CreateTables.bas): NO tblAcademicYear/tblTerm (year via tblConfig); tblGrade = ExamType + Grade (NOT CC+Compo+TermID); tblClass = ClassName, SpecID, AcademicYear (NOT Name/YearID/Track); tblStudent = LastName_fr/FirstName_fr/LastName_ar/FirstName_ar, DateOfBirth (NOT DOB); tblModule has Hours (NOT Coefficient); tblSpecialization PK = SpecID (Text). NOTE: this contradicts my earlier Week-3 bulletin spec (which assumed CC+Compo + Coefficient + tblModule/TermID) — the bulletin queries/VBA would need remapping to ExamType/Grade/Hours if ever revisited.
+2) mod_SeedDemo.bas — KAMEL FIXED IT HIMSELF to match the real schema. DO NOT rewrite/touch it.
+3) PAPER SCOPE BROADENED (OpenCode, both EN+FR): Ta'allim now framed for ALL THREE cycles (primary ابتدائي / middle متوسط / secondary ثانوي); title → 'Algerian Schools / établissements scolaires algériens'; pilot remains MIDDLE-SCHOOL ONLY (honest); added keyword 'multi-level education'; §2.6 added a 4th gap; TOPIC_MAPPING.md restructured (CM2→BAC, 120 grammar topics, 1,200 vocab, 9 years). MY exported _FINAL manuscripts are now BEHIND this (they say middle-school-focused) — offer to re-sync if needed.
+4) OPEN: pilot site = Allal vs the manuscript's 'El Bayadh 4 collèges' — must be reconciled in §1.6/§3.3.
+This turn delivered: EN abstract + Arabic ملخص + keywords (multi-cycle framing), school outreach (FR+AR, email+WhatsApp), and the 6-Week Middle-School Pilot Plan doc.
+
+## Notes
+
+2026-07-27 ~04:10: User relayed an OpenCode handoff. Progress: Literature Review done (02_literature_review.md, ~1,800 words, 27 refs). New local files: SCHOOL_SPECIALIZATIONS_TEMPLATE.md, 00-MASTER-ROADMAP.md, MERGED_MASTER.md (EdTech_System folder). Only an Obsidian graph screenshot was uploaded here — the 4 .md files are NOT accessible.
+
+Workflow: OpenCode = build, HyperAgent = plan/spec, Obsidian 'LifeWorkspace' vault = notes. Obsidian graph shows a broad personal vault (Freelancing, Astrology, Academix_SaaS, KDP_Self-Publishing, Academic Editing/Writing, Personal_Finance, Health_Tracker, 30_Day_Action_Plan, CLAUDE_GUI_MASTER_MEMORY, etc.) and an ERP_dss_v13.4 Excel file (Academix DSS lineage).
+
+This turn: chose SIS MVP over Methodology (unblocked + uses Access/VBA edge). Created 'Student Information System — MVP Build Spec (MS Access)' doc — build-ready for OpenCode. Decision D10: build SIS MVP in MS Access first, portable schema for later web migration. Methodology deferred (needs Intro + Lit Review uploaded for alignment). Paper status: §1,§2 done; §3–6 pending.
+
+2026-07-27 (later): Built interactive SIS mockup webpage (artifact cms2o101g28jn08ads3tf6m8k). 5 screens, FR/AR toggle + RTL, printable bilingual Algerian bulletin, dual-track (academic subjects vs vocational modules, Ministry header adapts). Placeholder school = "Groupe Scolaire El-Amel" — awaiting real school name/logo. Sample data fictional. NOTE: the specializations intake (Round 1 AskQuestion) was NOT answered — user pivoted to the mockup instead; Curriculum Designer still blocked on real specializations.
+
+2026-07-27 (later still): Drafted Methodology §3 as standalone doc (id cms2o6awb254v07ad1mymaeb6). Assumptions to confirm with user's Intro: (1) target FL = French/FLE; (2) primary outcome = vocabulary acquisition+retention; (3) design = 2-group quasi-experiment (~60 exp / ~60 control) — if all 120 use Taallim, convert to single-group pre/post; (4) delayed post-test +2 wks; (5) mixed-methods; (6) written in English, can produce French version. Paper: §1,§2,§3(draft) done; §4 Results, §5 Discussion, §6 Conclusion pending.
+
+2026-07-27 ~04:51 (OpenCode Week 1 done): School CONFIRMED = Allal. Data: 5 levels (1AM–BAC), 4 fields (IT/Commerce/Electricity/Mechanics), 22 specializations, diplomas CAP/BEP/BTS. SIS DB built in Access: 13 tables (tblLevel, tblField, tblDiploma, tblSpecialization, tblModule, tblTeacher, tblStudent, tblClass, tblEnrollment, tblGrade, tblAttendance, tblFee, tblConfig) via mod_CreateTables.bas + mod_Utils.bas (matricule gen/validation/calc) + seed data.
+
+CORRECTION to earlier assumption: Allal academic track = middle→secondary (1AM–BAC), NOT elementary. Schema grew 11→13 (added Field, Diploma, Module, Fee, Config).
+
+This turn: produced 'SIS MVP — Week 2 Forms Build Brief'. Flagged open schema question: how are ACADEMIC subjects represented vs vocational modules (tblModule has no generic tblSubject sibling)? Mockup still uses placeholder 'El-Amel' — offer to rename to Allal + real 4 fields once ALLAL_SCHOOL_PROFILE.md / CURRICULUM_SEED_DATA.json are shared. Recommended: Option 2 (test tables) → Option 1 (forms); Option 3 (Results) premature → offer scaffold.
+
+## Plan Overview
+
+User (appears to be "MAHI") is a teacher / ed-tech builder in Algeria. On 2026-07-27 they uploaded two logs from PRIOR AI sessions (transcripts mixing the earlier assistant's reasoning + outputs). Task for THIS thread not yet specified — files uploaded after I requested them; awaiting direction.
+
+File 6 (.txt, 13.5KB): thread that began as "is there a market for an MS Access teaching system, something concrete not a disposable app" and evolved into a vision for a DUAL-TRACK, AI-powered school management ERP for an Algerian private school — academic (elementary→secondary→BAC) AND vocational (التكوين三种职业 / formation professionnelle), Ministry-of-Vocational-Training verified. Contains market research, an "Access Database Starter Kit" product/pricing concept ($35–$210; Yr1 ~240 sales/~$15K), a master plan, and a Curriculum Designer concept (20 fields → 229 specializations → 2,400+ modules → 12,000+ competencies, RNFC-2026 compliant). Stopped at: "What specializations does your former school offer?"
+
+File 7 (.md, 2.7KB): thread on "Taallim", an education app — Flashcard System (SM-2 spaced repetition), MCQ Generator, Mind-Map Generator, Streamlit app (taallim_app.py, 6 tabs) + launcher, 150+ pilot exercises — plus an academic paper targeting the Multilinguales journal (ASJP), intro draft (~950 words) + outline, planned pilot (120 students, 6 weeks). Stopped offering: test the app / draft Literature Review / draft Methodology.
+
+User background (from logs): taught + worked in administration at a private school; 6-month MS Office teaching certificate (تلقين مبادئ الإعلام الآلي → "agent administrateur"); built "Academix DSS" in VBA; wants "concrete" products (ownership, lasting value) not subscription apps; bilingual Arabic/French.
+
+Local file paths on user's machine: C:\Users\Admin\My Drive\LifeWorkspace\10_Education_Project and 04_Ideas_&_Projects\MS_Access_School_System (00-MASTER-PLAN.md, 01-CURRICULUM-DESIGNER.md). I cannot access these — only files uploaded into chat.
+
+## Plan Tasks
+
+Grammar/teacher reconciliation sweep — DONE (2026-07-27):
+- [x] Relabeled taallim_analysis.py (grammar/teacher) + re-exported
+- [x] Rebuilt + re-exported the French manuscript (reconciled grammar/teacher §3–§6; §1/§2 placeholders)
+- [x] Bannered the pre-reconciliation in-app docs (compiled EN + FR manuscripts, standalone §3 EN + FR, §4/§5 templates) pointing to the canonical exported files
+
+Canonical reconciled artifacts = exported files Taallim_Manuscript_EN and Taallim_Manuscrit_FR (EN + FR). In-app manuscript docs are pre-reconciliation and flagged as such.
+
+
+---
+
+Linked from: [[00-MOC-Projects]]

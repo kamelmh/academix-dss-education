@@ -1,0 +1,299 @@
+{
+  "school": {
+    "name_ar": "المؤسسة الخاصة علال بدر الدين للتكوين المهني",
+    "name_fr": "Institut Privé Allal Badr El-Din pour la Formation Professionnelle",
+    "name_en": "Private Institution Allal Badr El-Din for Vocational Training",
+    "location": "El Bayadh, Algeria",
+    "status": "Ministry-of-Vocational-Training-verified",
+    "language": "bilingual"
+  },
+  "levels": [
+    {
+      "level_id": 1,
+      "name_fr": "1ère année moyenne",
+      "name_ar": "الأولى متوسط",
+      "cycle": "middle",
+      "order_index": 1
+    },
+    {
+      "level_id": 2,
+      "name_fr": "2ème année moyenne",
+      "name_ar": "الثانية متوسط",
+      "cycle": "middle",
+      "order_index": 2
+    },
+    {
+      "level_id": 3,
+      "name_fr": "3ème année moyenne",
+      "name_ar": "الثالثة متوسط",
+      "cycle": "middle",
+      "order_index": 3
+    },
+    {
+      "level_id": 4,
+      "name_fr": "4ème année moyenne",
+      "name_ar": "الرابعة ثانوي",
+      "cycle": "secondary",
+      "order_index": 4
+    },
+    {
+      "level_id": 5,
+      "name_fr": "Baccalauréat",
+      "name_ar": "البكالوريا",
+      "cycle": "secondary",
+      "order_index": 5
+    }
+  ],
+  "fields": [
+    {
+      "field_id": 1,
+      "name_fr": "Informatique et Numérique",
+      "name_ar": "المعلوماتية والرقمية",
+      "code": "IT"
+    },
+    {
+      "field_id": 2,
+      "name_fr": "Commerce",
+      "name_ar": "التجارة",
+      "code": "COM"
+    },
+    {
+      "field_id": 3,
+      "name_fr": "Électricité",
+      "name_ar": "الكهرباء",
+      "code": "ELEC"
+    },
+    {
+      "field_id": 4,
+      "name_fr": "Mécanique",
+      "name_ar": "الميكانيكا",
+      "code": "MECH"
+    }
+  ],
+  "diplomas": [
+    {
+      "diploma_id": 1,
+      "name_fr": "Certificat d'Aptitude Professionnelle",
+      "name_ar": "شهادة الكفاءة المهنية",
+      "abbreviation": "CAP",
+      "duration_months": 12,
+      "level_required": 3
+    },
+    {
+      "diploma_id": 2,
+      "name_fr": "Brevet d'Études Professionnelles",
+      "name_ar": "شهادة دراسات مهنية",
+      "abbreviation": "BEP",
+      "duration_months": 24,
+      "level_required": 4
+    },
+    {
+      "diploma_id": 3,
+      "name_fr": "Brevet de Technicien Supérieur",
+      "name_ar": "شهادة تقني سام",
+      "abbreviation": "BTS",
+      "duration_months": 24,
+      "level_required": 5
+    }
+  ],
+  "specializations": [
+    {
+      "spec_id": "IT-01",
+      "field_id": 1,
+      "name_fr": "Assistant administrateur",
+      "name_ar": "مساعد إداري",
+      "diploma_id": 1,
+      "duration_months": 12,
+      "modules": ["Informatique de base", "Réseaux", "Systèmes d'exploitation", "Administration"]
+    },
+    {
+      "spec_id": "IT-02",
+      "field_id": 1,
+      "name_fr": "Développeur web",
+      "name_ar": "مطور ويب",
+      "diploma_id": 1,
+      "duration_months": 12,
+      "modules": ["HTML/CSS", "JavaScript", "PHP", " bases de données"]
+    },
+    {
+      "spec_id": "IT-03",
+      "field_id": 1,
+      "name_fr": "Maintenance informatique",
+      "name_ar": "صيانة الحاسوب",
+      "diploma_id": 1,
+      "duration_months": 12,
+      "modules": ["Matériel informatique", "Diagnostic", "Réparation", "Prévention"]
+    },
+    {
+      "spec_id": "IT-04",
+      "field_id": 1,
+      "name_fr": "Intégrateur web",
+      "name_ar": "متكامل ويب",
+      "diploma_id": 2,
+      "duration_months": 24,
+      "modules": ["Design", "Intégration", "CMS", "SEO"]
+    },
+    {
+      "spec_id": "IT-05",
+      "field_id": 1,
+      "name_fr": "Administrateur systèmes et réseaux",
+      "name_ar": "مسؤول الأنظمة والشبكات",
+      "diploma_id": 2,
+      "duration_months": 24,
+      "modules": ["Linux", "Windows Server", "Réseaux", "Sécurité"]
+    },
+    {
+      "spec_id": "IT-06",
+      "field_id": 1,
+      "name_fr": "Technicien en cybersécurité",
+      "name_ar": "تقني في الأمن السيبراني",
+      "diploma_id": 3,
+      "duration_months": 24,
+      "modules": ["Sécurité informatique", "Pentesting", "Forensics", "Gestion des risques"]
+    },
+    {
+      "spec_id": "IT-07",
+      "field_id": 1,
+      "name_fr": "Développeur d'applications",
+      "name_ar": "مطور تطبيقات",
+      "diploma_id": 3,
+      "duration_months": 24,
+      "modules": ["Programmation", "Bases de données", "Développement mobile", "Cloud"]
+    },
+    {
+      "spec_id": "COM-01",
+      "field_id": 2,
+      "name_fr": "Comptable",
+      "name_ar": "محاسب",
+      "diploma_id": 1,
+      "duration_months": 12,
+      "modules": ["Comptabilité générale", "Facturation", "Paie", "Excel"]
+    },
+    {
+      "spec_id": "COM-02",
+      "field_id": 2,
+      "name_fr": "Assistant commercial",
+      "name_ar": "مساعد تجاري",
+      "diploma_id": 1,
+      "duration_months": 12,
+      "modules": ["Techniques de vente", "Négociation", "CRM", "Communication"]
+    },
+    {
+      "spec_id": "COM-03",
+      "field_id": 2,
+      "name_fr": "Secrétaire assistant(e)",
+      "name_ar": "سكرتير تنفيذي",
+      "diploma_id": 1,
+      "duration_months": 12,
+      "modules": ["Secrétariat", "Bureautique", "Accueil", "Organisation"]
+    },
+    {
+      "spec_id": "COM-04",
+      "field_id": 2,
+      "name_fr": "Commerce international",
+      "name_ar": "التجارة الدولية",
+      "diploma_id": 2,
+      "duration_months": 24,
+      "modules": ["Commerce extérieur", "Douanes", "Logistique", "Finance"]
+    },
+    {
+      "spec_id": "COM-05",
+      "field_id": 2,
+      "name_fr": "Gestion des entreprises",
+      "name_ar": "إدارة المؤسسات",
+      "diploma_id": 2,
+      "duration_months": 24,
+      "modules": ["Management", "Gestion financière", "RH", "Marketing"]
+    },
+    {
+      "spec_id": "COM-06",
+      "field_id": 2,
+      "name_fr": "Marketing et commerce",
+      "name_ar": "التسويق والتجارة",
+      "diploma_id": 3,
+      "duration_months": 24,
+      "modules": ["Marketing digital", "Stratégie", "E-commerce", "Analytics"]
+    },
+    {
+      "spec_id": "ELEC-01",
+      "field_id": 3,
+      "name_fr": "Installateur électricien",
+      "name_ar": "كهربائي تركيب",
+      "diploma_id": 1,
+      "duration_months": 12,
+      "modules": ["Électricité générale", "Câblage", "Normes", "Sécurité"]
+    },
+    {
+      "spec_id": "ELEC-02",
+      "field_id": 3,
+      "name_fr": "Électricien de maintenance",
+      "name_ar": "كهربائي صيانة",
+      "diploma_id": 1,
+      "duration_months": 12,
+      "modules": ["Diagnostic", "Réparation", "Prévention", "Automatisme"]
+    },
+    {
+      "spec_id": "ELEC-03",
+      "field_id": 3,
+      "name_fr": "Électrotechnique",
+      "name_ar": "الكهرباء الصناعية",
+      "diploma_id": 2,
+      "duration_months": 24,
+      "modules": ["Électrotechnique", "Automatisme", "Commandes", "Industrie"]
+    },
+    {
+      "spec_id": "ELEC-04",
+      "field_id": 3,
+      "name_fr": "Électronique industrielle",
+      "name_ar": "الإلكترونيك الصناعي",
+      "diploma_id": 2,
+      "duration_months": 24,
+      "modules": ["Électronique", "Microcontrôleurs", "Capteurs", "Automatisme"]
+    },
+    {
+      "spec_id": "ELEC-05",
+      "field_id": 3,
+      "name_fr": "Froid et climatisation",
+      "name_ar": "التكييف والتبريد",
+      "diploma_id": 3,
+      "duration_months": 24,
+      "modules": ["Thermodynamique", "Froid", "Climatisation", "Maintenance"]
+    },
+    {
+      "spec_id": "MECH-01",
+      "field_id": 4,
+      "name_fr": "Mécanique auto",
+      "name_ar": "ميكانيكا السيارات",
+      "diploma_id": 1,
+      "duration_months": 12,
+      "modules": ["Moteur", "Transmission", "Freinage", "Diagnostic"]
+    },
+    {
+      "spec_id": "MECH-02",
+      "field_id": 4,
+      "name_fr": "Soudure",
+      "name_ar": "اللحام",
+      "diploma_id": 1,
+      "duration_months": 12,
+      "modules": ["Soudure arc", "Soudure gaz", "Lecture de plans", "Sécurité"]
+    },
+    {
+      "spec_id": "MECH-03",
+      "field_id": 4,
+      "name_fr": "Mécanique industrielle",
+      "name_ar": "الميكانيك الصناعي",
+      "diploma_id": 2,
+      "duration_months": 24,
+      "modules": ["Usinage", "Tournage", "Fraisage", "Contrôle qualité"]
+    },
+    {
+      "spec_id": "MECH-04",
+      "field_id": 4,
+      "name_fr": "Maintenance industrielle",
+      "name_ar": "الصيانة الصناعية",
+      "diploma_id": 3,
+      "duration_months": 24,
+      "modules": ["Maintenance préventive", "Maintenance corrective", "TPM", "GMAO"]
+    }
+  ]
+}
