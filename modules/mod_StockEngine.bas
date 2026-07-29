@@ -18,19 +18,19 @@ End Type
 
 
 ' ================================================================================
-' CONSTANTS ? Synchronized with Unitï¿½ de traitement VBA GROUND_TRUTH
+' CONSTANTS ? Synchronized with Unit� de traitement VBA GROUND_TRUTH
 ' ================================================================================
 Private Const ORDER_COST_S  As Double = 801.45 ' DZD ? full order cycle cost (field-refined from 500)
 Private Const HOLDING_RATE  As Double = 0.2    ' 20% of unit price per year
 Private Const LEAD_TIME_DEFAULT As Integer = 2 ' Default delivery days
 
-' Article-specific safety stocks ? mirrors UnitÃ© de traitement VBA GROUND_TRUTH (Calibrated v13.4 from v7 historical)
+' Article-specific safety stocks ? mirrors Unité de traitement VBA GROUND_TRUTH (Calibrated v13.4 from v7 historical)
 Public Function GetSafetyStock(ByVal sku As String) As Double
     Select Case UCase(Trim(sku))
         Case "ART-001": GetSafetyStock = 400  ' Papier A4 (v7 Stock Min)
         Case "ART-002": GetSafetyStock = 200  ' Toner G030 (case study value)
         Case "ART-003": GetSafetyStock = 30   ' Papier A3 (v7 Stock Min)
-        Case "ART-004": GetSafetyStock = 20   ' BoÃ®te archives (v7 Stock Min)
+        Case "ART-004": GetSafetyStock = 20   ' Boîte archives (v7 Stock Min)
         Case "ART-005": GetSafetyStock = 2    ' Agrafeuse (v7 Stock Min)
         Case "ART-006": GetSafetyStock = 5    ' Stylos (v7 Stock Min)
         Case "ART-007": GetSafetyStock = 2    ' Registre 5m (v7 Stock Min)
@@ -41,7 +41,7 @@ Public Function GetSafetyStock(ByVal sku As String) As Double
         Case "ART-012": GetSafetyStock = 5    ' Marqueur (v7 Stock Min)
         Case "ART-013": GetSafetyStock = 10   ' Encre cachets (v7 Stock Min)
         Case "ART-014": GetSafetyStock = 5    ' Classeur (v7 Stock Min)
-        Case "ART-015": GetSafetyStock = 39   ' Toner gÃ©nÃ©rique (v7 Stock Min)
+        Case "ART-015": GetSafetyStock = 39   ' Toner générique (v7 Stock Min)
         Case Else:      GetSafetyStock = 50
     End Select
 End Function
@@ -125,21 +125,21 @@ Public Function GetArticles(ByVal filterCat As String) As Collection
     On Error GoTo 0
 
     If wsArt Is Nothing Then
-        articles.Add "ART-001 | Papier A4 80g/mÂ²"
+        articles.Add "ART-001 | Papier A4 80g/m²"
         articles.Add "ART-002 | Toner G030 (noir)"
-        articles.Add "ART-003 | Papier A3 80g/mÂ²"
-        articles.Add "ART-004 | BoÃ®te archives carton"
+        articles.Add "ART-003 | Papier A3 80g/m²"
+        articles.Add "ART-004 | Boîte archives carton"
         articles.Add "ART-005 | Agrafeuse de bureau"
-        articles.Add "ART-006 | Stylos bille boÃ®te/50"
+        articles.Add "ART-006 | Stylos bille boîte/50"
         articles.Add "ART-007 | Registre grand format 5m"
         articles.Add "ART-008 | Encre tampon"
         articles.Add "ART-009 | Sous-chemise carton"
-        articles.Add "ART-010 | Chemise cartonnÃ©e"
+        articles.Add "ART-010 | Chemise cartonnée"
         articles.Add "ART-011 | Rouleau papier fax"
         articles.Add "ART-012 | Marqueur permanent noir"
         articles.Add "ART-013 | Encre pour cachets"
-        articles.Add "ART-014 | Classeur Ã  levier"
-        articles.Add "ART-015 | Cartouche toner gÃ©nÃ©rique"
+        articles.Add "ART-014 | Classeur à levier"
+        articles.Add "ART-015 | Cartouche toner générique"
         Set GetArticles = articles
         Exit Function
     End If
