@@ -18,19 +18,19 @@ End Type
 
 
 ' ================================================================================
-' CONSTANTS ? Synchronized with Unit� de traitement VBA GROUND_TRUTH
+' CONSTANTS ? Synchronized with Unitï¿½ de traitement VBA GROUND_TRUTH
 ' ================================================================================
 Private Const ORDER_COST_S  As Double = 801.45 ' DZD ? full order cycle cost (field-refined from 500)
 Private Const HOLDING_RATE  As Double = 0.2    ' 20% of unit price per year
 Private Const LEAD_TIME_DEFAULT As Integer = 2 ' Default delivery days
 
-' Article-specific safety stocks ? mirrors Unité de traitement VBA GROUND_TRUTH (Calibrated v13.4 from v7 historical)
+' Article-specific safety stocks ? mirrors UnitÃ© de traitement VBA GROUND_TRUTH (Calibrated v13.4 from v7 historical)
 Public Function GetSafetyStock(ByVal sku As String) As Double
     Select Case UCase(Trim(sku))
         Case "ART-001": GetSafetyStock = 400  ' Papier A4 (v7 Stock Min)
         Case "ART-002": GetSafetyStock = 200  ' Toner G030 (case study value)
         Case "ART-003": GetSafetyStock = 30   ' Papier A3 (v7 Stock Min)
-        Case "ART-004": GetSafetyStock = 20   ' Boîte archives (v7 Stock Min)
+        Case "ART-004": GetSafetyStock = 20   ' BoÃ®te archives (v7 Stock Min)
         Case "ART-005": GetSafetyStock = 2    ' Agrafeuse (v7 Stock Min)
         Case "ART-006": GetSafetyStock = 5    ' Stylos (v7 Stock Min)
         Case "ART-007": GetSafetyStock = 2    ' Registre 5m (v7 Stock Min)
@@ -41,7 +41,7 @@ Public Function GetSafetyStock(ByVal sku As String) As Double
         Case "ART-012": GetSafetyStock = 5    ' Marqueur (v7 Stock Min)
         Case "ART-013": GetSafetyStock = 10   ' Encre cachets (v7 Stock Min)
         Case "ART-014": GetSafetyStock = 5    ' Classeur (v7 Stock Min)
-        Case "ART-015": GetSafetyStock = 39   ' Toner générique (v7 Stock Min)
+        Case "ART-015": GetSafetyStock = 39   ' Toner gÃ©nÃ©rique (v7 Stock Min)
         Case Else:      GetSafetyStock = 50
     End Select
 End Function
@@ -125,21 +125,21 @@ Public Function GetArticles(ByVal filterCat As String) As Collection
     On Error GoTo 0
 
     If wsArt Is Nothing Then
-        articles.Add "ART-001 | Papier A4 80g/m²"
+        articles.Add "ART-001 | Papier A4 80g/mÂ²"
         articles.Add "ART-002 | Toner G030 (noir)"
-        articles.Add "ART-003 | Papier A3 80g/m²"
-        articles.Add "ART-004 | Boîte archives carton"
+        articles.Add "ART-003 | Papier A3 80g/mÂ²"
+        articles.Add "ART-004 | BoÃ®te archives carton"
         articles.Add "ART-005 | Agrafeuse de bureau"
-        articles.Add "ART-006 | Stylos bille boîte/50"
+        articles.Add "ART-006 | Stylos bille boÃ®te/50"
         articles.Add "ART-007 | Registre grand format 5m"
         articles.Add "ART-008 | Encre tampon"
         articles.Add "ART-009 | Sous-chemise carton"
-        articles.Add "ART-010 | Chemise cartonnée"
+        articles.Add "ART-010 | Chemise cartonnÃ©e"
         articles.Add "ART-011 | Rouleau papier fax"
         articles.Add "ART-012 | Marqueur permanent noir"
         articles.Add "ART-013 | Encre pour cachets"
-        articles.Add "ART-014 | Classeur à levier"
-        articles.Add "ART-015 | Cartouche toner générique"
+        articles.Add "ART-014 | Classeur Ã  levier"
+        articles.Add "ART-015 | Cartouche toner gÃ©nÃ©rique"
         Set GetArticles = articles
         Exit Function
     End If
@@ -281,25 +281,154 @@ End Function
 
 ' ================================================================================
 ' FUNCTION: CalculateCMUP
-' Formula: CMUP = Total IN Value / Total IN Quantity
+' Chronological moving weighted average.
+'
+' Basis: SCF, arrete du 26/07/2008, points 123-6 / 123-7 (aligne IAS 2), and the
+' TAG1801 definition (SEMESTRE III, p.33): the average is taken over the stock
+' HELD AT THE DATE OF ISSUE - "en divisant le cout total des stocks par le nombre
+' de stocks en stock a la date de la sortie". Opening stock must therefore be
+' carried forward.
+'
+' The previous implementation divided total IN value by total IN quantity. That
+' ignores opening stock entirely and is correct only when opening stock is zero.
+'
+' Pass 1 derives the opening quantity by backing the movements out of the live
+' balance:  initialQty = currentBalance - totalIn + totalOut
+' Pass 2 walks the movements in DATE order, recomputing the average after each.
+'
+' Note: this domain defines no TVA parameters (there is no TAX_RATE or
+' PU_INCLUDES_TVA in mod_Config), so unit costs are taken as recorded - the price
+' applied per unit is unchanged from the previous implementation.
+'
+' EXPECT REPORTED VALUATIONS TO MOVE. The change is not limited to opening stock.
+' The previous method was a lifetime average of all inbound, so it also ignored
+' the effect of issues; this one averages over the stock actually held. The two
+' agree only when opening stock is zero AND no issue has occurred. Where they
+' differ, the previous figure was generally an OVERSTATEMENT when opening stock
+' was cheaper than later receipts - which is the inventory-valuation exposure the
+' correction removes.
 ' ================================================================================
 Public Function CalculateCMUP(ByVal sku As String) As Double
-    On Error Resume Next
+    On Error GoTo ErrorHandler
+
     Dim wsMouv As Worksheet: Set wsMouv = ThisWorkbook.Sheets(mod_Config.SHEET_MOUVEMENTS)
     Dim wsArt As Worksheet: Set wsArt = ThisWorkbook.Sheets(mod_Config.SHEET_ARTICLES)
     If wsMouv Is Nothing Or wsArt Is Nothing Then CalculateCMUP = 0: Exit Function
 
-    Dim totalInQty As Double, TotalINValue As Double
-    wsMouv.Unprotect Password:=mod_Config.MASTER_PWD
-    totalInQty = WorksheetFunction.SumIfs(wsMouv.Columns(COL_MOUV_QTE), wsMouv.Columns(COL_MOUV_CODE_ARTICLE), sku, wsMouv.Columns(COL_MOUV_TYPE), "IN")
-    TotalINValue = WorksheetFunction.SumIfs(wsMouv.Columns(COL_MOUV_VALEUR), wsMouv.Columns(COL_MOUV_CODE_ARTICLE), sku, wsMouv.Columns(COL_MOUV_TYPE), "IN")
+    ' --- Locate the article to read its live balance and unit price ---
+    Dim foundRow As Variant
+    foundRow = Application.Match(sku, wsArt.Range("A:A"), 0)
+    If IsError(foundRow) Then CalculateCMUP = 0: Exit Function
 
-    ' CMUP = Total IN Value / Total IN Quantity (standard weighted average cost)
-    If totalInQty > 0 Then
-        CalculateCMUP = TotalINValue / totalInQty
-    Else
-        CalculateCMUP = 0
-    End If
+    Dim currentBalance As Double: currentBalance = Val(wsArt.Cells(foundRow, COL_ART_STOCK).Value)
+    Dim unitPrice As Double: unitPrice = Val(wsArt.Cells(foundRow, COL_ART_PU).Value)
+
+    wsMouv.Unprotect Password:=mod_Config.MASTER_PWD
+
+    Dim lastRow As Long
+    lastRow = wsMouv.Cells(wsMouv.Rows.Count, COL_MOUV_CODE_ARTICLE).End(xlUp).Row
+
+    ' --- Pass 1: net the movements so the opening stock can be backed out ---
+    Dim i As Long, mvType As String
+    Dim totalInQty As Double, totalOutQty As Double
+    For i = 2 To lastRow
+        If Trim(wsMouv.Cells(i, COL_MOUV_CODE_ARTICLE).Value) = sku Then
+            mvType = UCase(Trim(wsMouv.Cells(i, COL_MOUV_TYPE).Value))
+            If mvType = "IN" Then
+                totalInQty = totalInQty + Val(wsMouv.Cells(i, COL_MOUV_QTE).Value)
+            ElseIf mvType = "OUT" Then
+                totalOutQty = totalOutQty + Val(wsMouv.Cells(i, COL_MOUV_QTE).Value)
+            End If
+        End If
+    Next i
+
+    Dim initialQty As Double: initialQty = currentBalance - totalInQty + totalOutQty
+    If initialQty < 0 Then initialQty = 0
+
+    ' --- Collect this article's movements ---
+    Dim mvDate() As Double, mvTypeArr() As String
+    Dim mvQty() As Double, mvVal() As Double, mvPU() As Double
+    Dim n As Long: n = 0
+    For i = 2 To lastRow
+        If Trim(wsMouv.Cells(i, COL_MOUV_CODE_ARTICLE).Value) = sku Then
+            n = n + 1
+            ReDim Preserve mvDate(1 To n)
+            ReDim Preserve mvTypeArr(1 To n)
+            ReDim Preserve mvQty(1 To n)
+            ReDim Preserve mvVal(1 To n)
+            ReDim Preserve mvPU(1 To n)
+            ' A date cell must go through CDate: Val() on a date string would
+            ' parse only the leading day number and corrupt the ordering.
+            If IsDate(wsMouv.Cells(i, COL_MOUV_DATE).Value) Then
+                mvDate(n) = CDbl(CDate(wsMouv.Cells(i, COL_MOUV_DATE).Value))
+            Else
+                mvDate(n) = Val(wsMouv.Cells(i, COL_MOUV_DATE).Value)
+            End If
+            mvTypeArr(n) = UCase(Trim(wsMouv.Cells(i, COL_MOUV_TYPE).Value))
+            mvQty(n) = Val(wsMouv.Cells(i, COL_MOUV_QTE).Value)
+            mvVal(n) = Val(wsMouv.Cells(i, COL_MOUV_VALEUR).Value)
+            mvPU(n) = Val(wsMouv.Cells(i, COL_MOUV_PU).Value)
+        End If
+    Next i
+
+    ' --- Sort chronologically; row order is not guaranteed to be by date ---
+    Dim j As Long, tD As Double, tT As String, tQ As Double, tV As Double, tP As Double
+    For i = 1 To n - 1
+        For j = i + 1 To n
+            If mvDate(j) < mvDate(i) Then
+                tD = mvDate(i): mvDate(i) = mvDate(j): mvDate(j) = tD
+                tT = mvTypeArr(i): mvTypeArr(i) = mvTypeArr(j): mvTypeArr(j) = tT
+                tQ = mvQty(i): mvQty(i) = mvQty(j): mvQty(j) = tQ
+                tV = mvVal(i): mvVal(i) = mvVal(j): mvVal(j) = tV
+                tP = mvPU(i): mvPU(i) = mvPU(j): mvPU(j) = tP
+            End If
+        Next j
+    Next i
+
+    ' --- Pass 2: moving weighted average, in date order ---
+    Dim qtyOnHand As Double: qtyOnHand = initialQty
+    Dim valueOnHand As Double: valueOnHand = initialQty * unitPrice
+    Dim cmupNow As Double
+    If qtyOnHand > 0 Then cmupNow = unitPrice Else cmupNow = 0
+
+    Dim unitCost As Double
+    For i = 1 To n
+        If mvTypeArr(i) = "IN" Then
+            ' VALEUR is written as qty * pu, so it is the reliable cost basis;
+            ' fall back to the per-unit column when VALEUR is absent.
+            If mvQty(i) > 0 And mvVal(i) > 0 Then
+                unitCost = mvVal(i) / mvQty(i)
+            ElseIf mvPU(i) > 0 Then
+                unitCost = mvPU(i)
+            Else
+                unitCost = 0
+            End If
+            qtyOnHand = qtyOnHand + mvQty(i)
+            valueOnHand = valueOnHand + (mvQty(i) * unitCost)
+
+        ElseIf mvTypeArr(i) = "OUT" Then
+            ' An issue leaves the unit cost unchanged; it removes qty at the
+            ' average prevailing at that date.
+            If qtyOnHand > 0 Then
+                valueOnHand = valueOnHand - (mvQty(i) * cmupNow)
+                qtyOnHand = qtyOnHand - mvQty(i)
+                If qtyOnHand < 0 Then qtyOnHand = 0
+                If valueOnHand < 0 Then valueOnHand = 0
+            End If
+        End If
+
+        If qtyOnHand > 0 Then cmupNow = valueOnHand / qtyOnHand Else cmupNow = 0
+    Next i
+
+    wsMouv.Protect Password:=mod_Config.MASTER_PWD, UserInterfaceOnly:=True
+    CalculateCMUP = cmupNow
+    On Error GoTo 0
+    Exit Function
+
+ErrorHandler:
+    On Error Resume Next
+    wsMouv.Protect Password:=mod_Config.MASTER_PWD, UserInterfaceOnly:=True
+    CalculateCMUP = 0
     On Error GoTo 0
 End Function
 
