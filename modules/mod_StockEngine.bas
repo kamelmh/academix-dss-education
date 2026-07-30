@@ -287,14 +287,25 @@ End Function
 ' TAG1801 definition (SEMESTRE III, p.33): the average is taken over the stock
 ' HELD AT THE DATE OF ISSUE - "en divisant le cout total des stocks par le nombre
 ' de stocks en stock a la date de la sortie". Opening stock must therefore be
-' carried forward.
+' included, and issues must be valued at the average prevailing at their date.
 '
 ' The previous implementation divided total IN value by total IN quantity. That
 ' ignores opening stock entirely and is correct only when opening stock is zero.
 '
-' Pass 1 derives the opening quantity by backing the movements out of the live
-' balance:  initialQty = currentBalance - totalIn + totalOut
-' Pass 2 walks the movements in DATE order, recomputing the average after each.
+' OPENING STOCK - note the domain difference, the column numbers are identical
+' but the meanings are not:
+'   Here      COL_ART_STOCK (col 3) IS the opening stock. mod_DemoData seeds it
+'             as "STOCK INITIAL", and UpdateArticleStockBalance - the only routine
+'             that would mutate it - is never called in this domain. The live
+'             figure is carried in COL_ART_STOCK_ACTUEL (col 7).
+'   Hardware  col 3 is the LIVE balance, mutated by UpdateArticleStockBalance
+'             from mod_Barcode and the generated stock-entry form. That domain
+'             has no stored opening-stock column, so it must recover one by
+'             backing the movements out: currentBalance - totalIn + totalOut.
+' Applying hardware's back-out here would subtract receipts from a figure that
+' never contained them, understating the opening quantity and often clamping it
+' to zero. So read col 3 directly - no derivation, and no dependence on whether
+' balances and movement rows are in sync.
 '
 ' Note: this domain defines no TVA parameters (there is no TAX_RATE or
 ' PU_INCLUDES_TVA in mod_Config), so unit costs are taken as recorded - the price
@@ -315,12 +326,13 @@ Public Function CalculateCMUP(ByVal sku As String) As Double
     Dim wsArt As Worksheet: Set wsArt = ThisWorkbook.Sheets(mod_Config.SHEET_ARTICLES)
     If wsMouv Is Nothing Or wsArt Is Nothing Then CalculateCMUP = 0: Exit Function
 
-    ' --- Locate the article to read its live balance and unit price ---
+    ' --- Locate the article, read its opening stock and unit price ---
     Dim foundRow As Variant
     foundRow = Application.Match(sku, wsArt.Range("A:A"), 0)
     If IsError(foundRow) Then CalculateCMUP = 0: Exit Function
 
-    Dim currentBalance As Double: currentBalance = Val(wsArt.Cells(foundRow, COL_ART_STOCK).Value)
+    Dim openingQty As Double: openingQty = Val(wsArt.Cells(foundRow, COL_ART_STOCK).Value)
+    If openingQty < 0 Then openingQty = 0
     Dim unitPrice As Double: unitPrice = Val(wsArt.Cells(foundRow, COL_ART_PU).Value)
 
     wsMouv.Unprotect Password:=mod_Config.MASTER_PWD
@@ -328,27 +340,10 @@ Public Function CalculateCMUP(ByVal sku As String) As Double
     Dim lastRow As Long
     lastRow = wsMouv.Cells(wsMouv.Rows.Count, COL_MOUV_CODE_ARTICLE).End(xlUp).Row
 
-    ' --- Pass 1: net the movements so the opening stock can be backed out ---
-    Dim i As Long, mvType As String
-    Dim totalInQty As Double, totalOutQty As Double
-    For i = 2 To lastRow
-        If Trim(wsMouv.Cells(i, COL_MOUV_CODE_ARTICLE).Value) = sku Then
-            mvType = UCase(Trim(wsMouv.Cells(i, COL_MOUV_TYPE).Value))
-            If mvType = "IN" Then
-                totalInQty = totalInQty + Val(wsMouv.Cells(i, COL_MOUV_QTE).Value)
-            ElseIf mvType = "OUT" Then
-                totalOutQty = totalOutQty + Val(wsMouv.Cells(i, COL_MOUV_QTE).Value)
-            End If
-        End If
-    Next i
-
-    Dim initialQty As Double: initialQty = currentBalance - totalInQty + totalOutQty
-    If initialQty < 0 Then initialQty = 0
-
     ' --- Collect this article's movements ---
     Dim mvDate() As Double, mvTypeArr() As String
     Dim mvQty() As Double, mvVal() As Double, mvPU() As Double
-    Dim n As Long: n = 0
+    Dim i As Long, n As Long: n = 0
     For i = 2 To lastRow
         If Trim(wsMouv.Cells(i, COL_MOUV_CODE_ARTICLE).Value) = sku Then
             n = n + 1
@@ -385,9 +380,9 @@ Public Function CalculateCMUP(ByVal sku As String) As Double
         Next j
     Next i
 
-    ' --- Pass 2: moving weighted average, in date order ---
-    Dim qtyOnHand As Double: qtyOnHand = initialQty
-    Dim valueOnHand As Double: valueOnHand = initialQty * unitPrice
+    ' --- Walk the movements, in date order ---
+    Dim qtyOnHand As Double: qtyOnHand = openingQty
+    Dim valueOnHand As Double: valueOnHand = openingQty * unitPrice
     Dim cmupNow As Double
     If qtyOnHand > 0 Then cmupNow = unitPrice Else cmupNow = 0
 
