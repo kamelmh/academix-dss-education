@@ -281,25 +281,149 @@ End Function
 
 ' ================================================================================
 ' FUNCTION: CalculateCMUP
-' Formula: CMUP = Total IN Value / Total IN Quantity
+' Chronological moving weighted average.
+'
+' Basis: SCF, arrete du 26/07/2008, points 123-6 / 123-7 (aligne IAS 2), and the
+' TAG1801 definition (SEMESTRE III, p.33): the average is taken over the stock
+' HELD AT THE DATE OF ISSUE - "en divisant le cout total des stocks par le nombre
+' de stocks en stock a la date de la sortie". Opening stock must therefore be
+' included, and issues must be valued at the average prevailing at their date.
+'
+' The previous implementation divided total IN value by total IN quantity. That
+' ignores opening stock entirely and is correct only when opening stock is zero.
+'
+' OPENING STOCK - note the domain difference, the column numbers are identical
+' but the meanings are not:
+'   Here      COL_ART_STOCK (col 3) IS the opening stock. mod_DemoData seeds it
+'             as "STOCK INITIAL", and UpdateArticleStockBalance - the only routine
+'             that would mutate it - is never called in this domain. The live
+'             figure is carried in COL_ART_STOCK_ACTUEL (col 7).
+'   Hardware  col 3 is the LIVE balance, mutated by UpdateArticleStockBalance
+'             from mod_Barcode and the generated stock-entry form. That domain
+'             has no stored opening-stock column, so it must recover one by
+'             backing the movements out: currentBalance - totalIn + totalOut.
+' Applying hardware's back-out here would subtract receipts from a figure that
+' never contained them, understating the opening quantity and often clamping it
+' to zero. So read col 3 directly - no derivation, and no dependence on whether
+' balances and movement rows are in sync.
+'
+' Note: this domain defines no TVA parameters (there is no TAX_RATE or
+' PU_INCLUDES_TVA in mod_Config), so unit costs are taken as recorded - the price
+' applied per unit is unchanged from the previous implementation.
+'
+' EXPECT REPORTED VALUATIONS TO MOVE. The change is not limited to opening stock.
+' The previous method was a lifetime average of all inbound, so it also ignored
+' the effect of issues; this one averages over the stock actually held. The two
+' agree only when opening stock is zero AND no issue has occurred. Where they
+' differ, the previous figure was generally an OVERSTATEMENT when opening stock
+' was cheaper than later receipts - which is the inventory-valuation exposure the
+' correction removes.
 ' ================================================================================
 Public Function CalculateCMUP(ByVal sku As String) As Double
-    On Error Resume Next
+    On Error GoTo ErrorHandler
+
     Dim wsMouv As Worksheet: Set wsMouv = ThisWorkbook.Sheets(mod_Config.SHEET_MOUVEMENTS)
     Dim wsArt As Worksheet: Set wsArt = ThisWorkbook.Sheets(mod_Config.SHEET_ARTICLES)
     If wsMouv Is Nothing Or wsArt Is Nothing Then CalculateCMUP = 0: Exit Function
 
-    Dim totalInQty As Double, TotalINValue As Double
-    wsMouv.Unprotect Password:=mod_Config.MASTER_PWD
-    totalInQty = WorksheetFunction.SumIfs(wsMouv.Columns(COL_MOUV_QTE), wsMouv.Columns(COL_MOUV_CODE_ARTICLE), sku, wsMouv.Columns(COL_MOUV_TYPE), "IN")
-    TotalINValue = WorksheetFunction.SumIfs(wsMouv.Columns(COL_MOUV_VALEUR), wsMouv.Columns(COL_MOUV_CODE_ARTICLE), sku, wsMouv.Columns(COL_MOUV_TYPE), "IN")
+    ' --- Locate the article, read its opening stock and unit price ---
+    Dim foundRow As Variant
+    foundRow = Application.Match(sku, wsArt.Range("A:A"), 0)
+    If IsError(foundRow) Then CalculateCMUP = 0: Exit Function
 
-    ' CMUP = Total IN Value / Total IN Quantity (standard weighted average cost)
-    If totalInQty > 0 Then
-        CalculateCMUP = TotalINValue / totalInQty
-    Else
-        CalculateCMUP = 0
-    End If
+    Dim openingQty As Double: openingQty = Val(wsArt.Cells(foundRow, COL_ART_STOCK).Value)
+    If openingQty < 0 Then openingQty = 0
+    Dim unitPrice As Double: unitPrice = Val(wsArt.Cells(foundRow, COL_ART_PU).Value)
+
+    wsMouv.Unprotect Password:=mod_Config.MASTER_PWD
+
+    Dim lastRow As Long
+    lastRow = wsMouv.Cells(wsMouv.Rows.Count, COL_MOUV_CODE_ARTICLE).End(xlUp).Row
+
+    ' --- Collect this article's movements ---
+    Dim mvDate() As Double, mvTypeArr() As String
+    Dim mvQty() As Double, mvVal() As Double, mvPU() As Double
+    Dim i As Long, n As Long: n = 0
+    For i = 2 To lastRow
+        If Trim(wsMouv.Cells(i, COL_MOUV_CODE_ARTICLE).Value) = sku Then
+            n = n + 1
+            ReDim Preserve mvDate(1 To n)
+            ReDim Preserve mvTypeArr(1 To n)
+            ReDim Preserve mvQty(1 To n)
+            ReDim Preserve mvVal(1 To n)
+            ReDim Preserve mvPU(1 To n)
+            ' A date cell must go through CDate: Val() on a date string would
+            ' parse only the leading day number and corrupt the ordering.
+            If IsDate(wsMouv.Cells(i, COL_MOUV_DATE).Value) Then
+                mvDate(n) = CDbl(CDate(wsMouv.Cells(i, COL_MOUV_DATE).Value))
+            Else
+                mvDate(n) = Val(wsMouv.Cells(i, COL_MOUV_DATE).Value)
+            End If
+            mvTypeArr(n) = UCase(Trim(wsMouv.Cells(i, COL_MOUV_TYPE).Value))
+            mvQty(n) = Val(wsMouv.Cells(i, COL_MOUV_QTE).Value)
+            mvVal(n) = Val(wsMouv.Cells(i, COL_MOUV_VALEUR).Value)
+            mvPU(n) = Val(wsMouv.Cells(i, COL_MOUV_PU).Value)
+        End If
+    Next i
+
+    ' --- Sort chronologically; row order is not guaranteed to be by date ---
+    Dim j As Long, tD As Double, tT As String, tQ As Double, tV As Double, tP As Double
+    For i = 1 To n - 1
+        For j = i + 1 To n
+            If mvDate(j) < mvDate(i) Then
+                tD = mvDate(i): mvDate(i) = mvDate(j): mvDate(j) = tD
+                tT = mvTypeArr(i): mvTypeArr(i) = mvTypeArr(j): mvTypeArr(j) = tT
+                tQ = mvQty(i): mvQty(i) = mvQty(j): mvQty(j) = tQ
+                tV = mvVal(i): mvVal(i) = mvVal(j): mvVal(j) = tV
+                tP = mvPU(i): mvPU(i) = mvPU(j): mvPU(j) = tP
+            End If
+        Next j
+    Next i
+
+    ' --- Walk the movements, in date order ---
+    Dim qtyOnHand As Double: qtyOnHand = openingQty
+    Dim valueOnHand As Double: valueOnHand = openingQty * unitPrice
+    Dim cmupNow As Double
+    If qtyOnHand > 0 Then cmupNow = unitPrice Else cmupNow = 0
+
+    Dim unitCost As Double
+    For i = 1 To n
+        If mvTypeArr(i) = "IN" Then
+            ' VALEUR is written as qty * pu, so it is the reliable cost basis;
+            ' fall back to the per-unit column when VALEUR is absent.
+            If mvQty(i) > 0 And mvVal(i) > 0 Then
+                unitCost = mvVal(i) / mvQty(i)
+            ElseIf mvPU(i) > 0 Then
+                unitCost = mvPU(i)
+            Else
+                unitCost = 0
+            End If
+            qtyOnHand = qtyOnHand + mvQty(i)
+            valueOnHand = valueOnHand + (mvQty(i) * unitCost)
+
+        ElseIf mvTypeArr(i) = "OUT" Then
+            ' An issue leaves the unit cost unchanged; it removes qty at the
+            ' average prevailing at that date.
+            If qtyOnHand > 0 Then
+                valueOnHand = valueOnHand - (mvQty(i) * cmupNow)
+                qtyOnHand = qtyOnHand - mvQty(i)
+                If qtyOnHand < 0 Then qtyOnHand = 0
+                If valueOnHand < 0 Then valueOnHand = 0
+            End If
+        End If
+
+        If qtyOnHand > 0 Then cmupNow = valueOnHand / qtyOnHand Else cmupNow = 0
+    Next i
+
+    wsMouv.Protect Password:=mod_Config.MASTER_PWD, UserInterfaceOnly:=True
+    CalculateCMUP = cmupNow
+    On Error GoTo 0
+    Exit Function
+
+ErrorHandler:
+    On Error Resume Next
+    wsMouv.Protect Password:=mod_Config.MASTER_PWD, UserInterfaceOnly:=True
+    CalculateCMUP = 0
     On Error GoTo 0
 End Function
 
